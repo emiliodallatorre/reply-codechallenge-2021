@@ -1,3 +1,6 @@
+from matplotlib import pyplot as plt
+
+
 def get_distance(a: tuple, b: tuple) -> int:
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
@@ -35,3 +38,31 @@ def get_score(buildings_positions: list, antennas_positions: list, buildings_spe
     score += reward if are_all_buildings_connected else 0
 
     return score
+
+
+def represent_situation(buildings_positions: list, antennas_positions: list, antennas_ranges: list) -> None:
+    buildings_positions_x = [building_position[0] for building_position in buildings_positions]
+    buildings_positions_y = [building_position[1] for building_position in buildings_positions]
+    plt.scatter(buildings_positions_x, buildings_positions_y, color="red", label="Buildings", marker="s")
+
+    antennas_positions_x = [antenna_position[0] for antenna_position in antennas_positions]
+    antennas_positions_y = [antenna_position[1] for antenna_position in antennas_positions]
+    plt.scatter(antennas_positions_x, antennas_positions_y, color="blue", label="Antennas", marker="P")
+
+    covered_positions_x: list = []
+    covered_positions_y: list = []
+    for antenna_index, antenna_position in enumerate(antennas_positions):
+        for x in range(antenna_position[0] - antennas_ranges[antenna_index], antenna_position[0] + antennas_ranges[
+            antenna_index] + 1):
+            max_y: int = antennas_ranges[antenna_index] - abs(x - antenna_position[0])
+
+            for y in range(antenna_position[1] - max_y, antenna_position[1] + max_y + 1):
+
+                if (x, y) not in buildings_positions and (x, y) not in antennas_positions:
+                    covered_positions_x.append(x)
+                    covered_positions_y.append(y)
+
+    plt.scatter(covered_positions_x, covered_positions_y, color="green", label="Covered positions", marker="x")
+
+    plt.legend()
+    plt.show()

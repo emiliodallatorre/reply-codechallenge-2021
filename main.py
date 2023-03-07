@@ -44,13 +44,14 @@ def resolve_input(input_file: str, max_loops: int, mutation_rate: float) -> tupl
         for x in range(building_position[0] - max_antenna_range, building_position[0] + max_antenna_range):
             max_y: int = abs(building_position[0] + max_antenna_range - x)
 
-            for y in range(-max_y + building_position[1], max_y + building_position[1]):
+            for y in range(-max_y + building_position[1], max_y + building_position[1] + 1):
                 if get_distance(building_position, (x, y)) <= max_antenna_range:
                     meaningful_positions.add((x, y))
+    meaningful_positions: list = list(meaningful_positions)
 
     solution, stats = do_genetics(buildings_positions, buildings_speed_score, buildings_latency_score, antennas_range,
                                   antennas_speeds,
-                                  reward, list(meaningful_positions), max_loops, mutation_rate)
+                                  reward, meaningful_positions, max_loops, mutation_rate)
 
     for antenna_id, antenna_position in enumerate(solution):
         antennas_ids.append(antenna_id)
@@ -64,6 +65,8 @@ def resolve_input(input_file: str, max_loops: int, mutation_rate: float) -> tupl
     print(
         f"Completato con score: {get_score(buildings_positions, antennas_positions, buildings_speed_score, buildings_latency_score, antennas_range, antennas_speeds, reward)}")
 
+    from utils import represent_situation
+    represent_situation(buildings_positions, antennas_positions, antennas_range)
     return stats
 
 
