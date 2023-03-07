@@ -38,16 +38,18 @@ def resolve_input(input_file: str, max_loops: int, mutation_rate: float) -> tupl
     # Seleziono le posizioni significative, in modo da impedire di piazzare un'antenna in punti in cui non si collega ad
     # alcun edificio
     max_antenna_range: int = max(antennas_range)
-    meaningful_positions: list = []
-    for x in range(grid_size[0]):
-        for y in range(grid_size[1]):
-            if not all([get_distance((x, y), building_position) > max_antenna_range for building_position in
-                        buildings_positions]):
-                meaningful_positions.append((x, y))
+    meaningful_positions: set = set()
+    for building_position in buildings_positions:
+        for x in range(building_position[0] - max_antenna_range, building_position[0] + max_antenna_range):
+            max_y: int = abs(building_position[0] + max_antenna_range - x)
+
+            for y in range(-max_y + building_position[1], max_y + building_position[1]):
+                if get_distance(building_position, (x, y)) <= max_antenna_range:
+                    meaningful_positions.add((x, y))
 
     solution, stats = do_genetics(buildings_positions, buildings_speed_score, buildings_latency_score, antennas_range,
                                   antennas_speeds,
-                                  reward, meaningful_positions, max_loops, mutation_rate)
+                                  reward, list(meaningful_positions), max_loops, mutation_rate)
 
     for antenna_id, antenna_position in enumerate(solution):
         antennas_ids.append(antenna_id)

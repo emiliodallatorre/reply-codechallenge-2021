@@ -31,6 +31,7 @@ def do_genetics(buildings_positions: list, buildings_speed_score: list,
     chromosome_length: int = len(antennas_range)
     population: list = []
 
+    print(len(meaningful_positions))
     mutation_rate = len(meaningful_positions) / 100
     support: list = []
     if len(meaningful_positions) > 100:
