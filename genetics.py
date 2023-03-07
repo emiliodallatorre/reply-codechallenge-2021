@@ -16,7 +16,7 @@ def crossover(parent_1: list, parent_2: list, meaningful_positions: list) -> lis
         child_1 = mutate(child_1, meaningful_positions)
         child_2 = mutate(child_2, meaningful_positions)
 
-    return [child_1, child_2]
+    return [parent_1, parent_2, child_1, child_2]
 
 
 def mutate(individual: list, meaningful_positions: list) -> list:
@@ -28,7 +28,7 @@ def mutate(individual: list, meaningful_positions: list) -> list:
 
 def do_genetics(buildings_positions: list, buildings_speed_score: list,
                 buildings_latency_score: list, antennas_range: list, antennas_speeds: list, reward: int,
-                meaningful_positions: list) -> list[tuple]:
+                meaningful_positions: list) -> tuple:
     chromosome_length: int = len(antennas_range)
     population: list = []
 
@@ -49,11 +49,17 @@ def do_genetics(buildings_positions: list, buildings_speed_score: list,
     if len(population) % 2 != 0:
         population.append(population[0])
 
+    best_fitnesses_by_generation: list = []
     for i in range(MAX_LOOPS):
         population.sort(key=lambda individual: get_fitness(buildings_positions, individual, buildings_speed_score,
                                                            buildings_latency_score, antennas_range, antennas_speeds,
                                                            reward), reverse=True)
 
+        population = population[:len(population) // 2]
+
+        best_fitnesses_by_generation.append(get_fitness(buildings_positions, population[0], buildings_speed_score,
+                                                        buildings_latency_score, antennas_range, antennas_speeds,
+                                                        reward))
         new_population: list = []
 
         for j in range(0, len(population), 2):
@@ -61,4 +67,4 @@ def do_genetics(buildings_positions: list, buildings_speed_score: list,
 
         population = new_population
 
-    return population[0]
+    return population[0], (range(MAX_LOOPS), best_fitnesses_by_generation)

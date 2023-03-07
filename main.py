@@ -1,3 +1,5 @@
+from matplotlib import pyplot as plt
+
 from genetics import do_genetics
 from utils import get_distance, get_score
 
@@ -41,9 +43,9 @@ for x in range(grid_size[0]):
                     buildings_positions]):
             meaningful_positions.append((x, y))
 
-solution: list = do_genetics(buildings_positions, buildings_speed_score, buildings_latency_score, antennas_range,
-                             antennas_speeds,
-                             reward, meaningful_positions)
+solution, stats = do_genetics(buildings_positions, buildings_speed_score, buildings_latency_score, antennas_range,
+                              antennas_speeds,
+                              reward, meaningful_positions)
 
 for antenna_id, antenna_position in enumerate(solution):
     antennas_ids.append(antenna_id)
@@ -56,3 +58,8 @@ with open("data/data_scenarios_a_example.out", "w") as f:
 
 print(
     f"Completato con score: {get_score(buildings_positions, antennas_positions, buildings_speed_score, buildings_latency_score, antennas_range, antennas_speeds, reward)}")
+
+plt.plot(*stats)
+plt.ylabel("Score")
+plt.xlabel("Generazione")
+plt.show()
