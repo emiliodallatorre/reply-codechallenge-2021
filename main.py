@@ -92,7 +92,7 @@ fig, axs = plt.subplots(len(stats), 1)
 for i, stat in enumerate(stats):
     axs[i].plot(*stat)
 
-    axs[i].set_xlabel("Generazione")
+    axs[i].set_xlabel("Generation")
     axs[i].set_ylabel("Score")
 
     axs[i].set_title(input_files[i] + " - Score: " + str(stat[1][-1]))
