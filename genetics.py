@@ -1,18 +1,17 @@
 from random import randint, random
 
+from tqdm import tqdm
+
 from utils import get_score as get_fitness
 
-MAX_LOOPS: int = 10000
-MUTATION_RATE: float = 0.2
 
-
-def crossover(parent_1: list, parent_2: list, meaningful_positions: list) -> list:
+def crossover(parent_1: list, parent_2: list, meaningful_positions: list, mutation_rate: float) -> list:
     crossover_point: int = randint(0, len(parent_1) - 1)
 
     child_1: list = parent_1[:crossover_point] + parent_2[crossover_point:]
     child_2: list = parent_2[:crossover_point] + parent_1[crossover_point:]
 
-    if random() < MUTATION_RATE:
+    if random() < mutation_rate:
         child_1 = mutate(child_1, meaningful_positions)
         child_2 = mutate(child_2, meaningful_positions)
 
@@ -28,12 +27,18 @@ def mutate(individual: list, meaningful_positions: list) -> list:
 
 def do_genetics(buildings_positions: list, buildings_speed_score: list,
                 buildings_latency_score: list, antennas_range: list, antennas_speeds: list, reward: int,
-                meaningful_positions: list) -> tuple:
+                meaningful_positions: list, max_loops: int, mutation_rate: float) -> tuple:
     chromosome_length: int = len(antennas_range)
     population: list = []
 
+    mutation_rate = len(meaningful_positions) / 100
+    support: list = []
+    if len(meaningful_positions) > 100:
+        for i in range(100):
+            support.append(meaningful_positions.pop(randint(0, len(meaningful_positions) - 1)))
+
     last_individual: list = []
-    for position in meaningful_positions:
+    for position in support:
         last_individual.append(position)
 
         if len(last_individual) == chromosome_length:
@@ -50,12 +55,13 @@ def do_genetics(buildings_positions: list, buildings_speed_score: list,
         population.append(population[0])
 
     best_fitnesses_by_generation: list = []
-    for i in range(MAX_LOOPS):
+    for i in tqdm(range(max_loops)):
         population.sort(key=lambda individual: get_fitness(buildings_positions, individual, buildings_speed_score,
                                                            buildings_latency_score, antennas_range, antennas_speeds,
                                                            reward), reverse=True)
 
-        population = population[:len(population) // 2]
+        if len(population) > 100:
+            population = population[:len(population) // 2]
 
         best_fitnesses_by_generation.append(get_fitness(buildings_positions, population[0], buildings_speed_score,
                                                         buildings_latency_score, antennas_range, antennas_speeds,
@@ -63,8 +69,8 @@ def do_genetics(buildings_positions: list, buildings_speed_score: list,
         new_population: list = []
 
         for j in range(0, len(population), 2):
-            new_population.extend(crossover(population[j], population[j + 1], meaningful_positions))
+            new_population.extend(crossover(population[j], population[j + 1], meaningful_positions, mutation_rate))
 
         population = new_population
 
-    return population[0], (range(MAX_LOOPS), best_fitnesses_by_generation)
+    return population[0], (range(max_loops), best_fitnesses_by_generation)
