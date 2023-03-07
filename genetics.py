@@ -31,7 +31,6 @@ def do_genetics(buildings_positions: list, buildings_speed_score: list,
     chromosome_length: int = len(antennas_range)
     population: list = []
 
-    print(len(meaningful_positions))
     mutation_rate = len(meaningful_positions) / 100
     support: list = []
     if len(meaningful_positions) > 100:
@@ -56,7 +55,7 @@ def do_genetics(buildings_positions: list, buildings_speed_score: list,
         population.append(population[0])
 
     best_fitnesses_by_generation: list = []
-    for i in tqdm(range(max_loops)):
+    for i in tqdm(range(max_loops), desc="Genetics"):
         population.sort(key=lambda individual: get_fitness(buildings_positions, individual, buildings_speed_score,
                                                            buildings_latency_score, antennas_range, antennas_speeds,
                                                            reward), reverse=True)

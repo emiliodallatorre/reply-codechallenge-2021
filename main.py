@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+from tqdm import tqdm
 
 from genetics import do_genetics
 from utils import get_distance, get_score
@@ -39,7 +40,7 @@ def resolve_input(input_file: str, max_loops: int, mutation_rate: float) -> tupl
     # alcun edificio
     max_antenna_range: int = max(antennas_range)
     meaningful_positions: set = set()
-    for building_position in buildings_positions:
+    for building_position in tqdm(buildings_positions, desc="Selecting meaningful positions"):
         for x in range(building_position[0] - max_antenna_range, building_position[0] + max_antenna_range):
             max_y: int = abs(building_position[0] + max_antenna_range - x)
 
